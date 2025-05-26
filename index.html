@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fundamentos de Auditoría</title>
+    <!-- Estilos CSS -->
+    <style>
+        body {
+            font-family: 'Arial Narrow', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f6f5; /* Gris claro cálido */
+            color: #34495e; /* Gris oscuro para texto */
+        }
+        header {
+            background-color: #2c3e50; /* Azul marino */
+            color: white;
+            text-align: center;
+            padding: 2rem;
+        }
+        /* Contenedor de dos columnas */
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        #network {
+            width: 50%;
+            height: 600px;
+            border: 1px solid #3498db; /* Azul más claro */
+            border-radius: 5px;
+        }
+        /* Estilo de pestañas en la columna derecha */
+        .tabs {
+            width: 45%;
+            height: 600px;
+            overflow-y: auto;
+        }
+        .tab-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .tab-links button {
+            background-color: #3498db; /* Azul más claro */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            font-family: 'Arial Narrow', sans-serif;
+        }
+        .tab-links button:hover {
+            background-color: #2980b9; /* Azul un poco más oscuro para hover */
+        }
+        .tab-links button.active {
+            background-color: #2980b9;
+        }
+        .tab-content {
+            display: none;
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .tab-content h2 {
+            color: #2c3e50; /* Azul marino */
+            font-family: 'Arial Narrow', sans-serif;
+        }
+        .tab-content h3 {
+            color: #3498db; /* Azul más claro */
+            font-family: 'Arial Narrow', sans-serif;
+        }
+        .tab-content ul {
+            list-style-type: decimal; /* Enumeración */
+            margin-left: 20px;
+            font-family: 'Arial Narrow', sans-serif;
+        }
+        /* Estilo para el gráfico */
+        #objetivosChart {
+            max-width: 100%;
+            height: 300px;
+            margin-top: 20px;
+        }
+        /* Estilo para el cuestionario */
+        .question {
+            margin-bottom: 15px;
+        }
+        .question label {
+            display: block;
+            margin-left: 20px;
+        }
+        #calificacion {
+            margin-top: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        #calcularBtn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        #calcularBtn:hover {
+            background-color: #2980b9;
+        }
+        /* Footer con nombre y expediente */
+        footer {
+            text-align: center;
+            padding: 1rem;
+            background-color: #2c3e50; /* Azul marino */
+            color: white;
+            font-size: 0.9rem;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+        }
+        /* Responsive */
+        @media (max-width: 800px) {
+            .container {
+                flex-direction: column;
+            }
+            #network, .tabs {
+                width: 100%;
+                height: 400px;
+            }
+            #objetivosChart {
+                height: 200px;
+            }
+        }
+    </style>
+    <!-- Librerías -->
+    <script src="https://visjs.github.io/vis-network/standalone/umd/vis-network.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Fundamentos de Auditoría</h1>
+    </header>
+
+    <!-- Contenedor de dos columnas -->
+    <div class="container">
+        <!-- Mapa Conceptual -->
+        <div id="network"></div>
+
+        <!-- Pestañas -->
+        <div class="tabs">
+            <div class="tab-links">
+                <button class="tab-link active" data-tab="fundamentos">Fundamentos de Auditoría</button>
+                <button class="tab-link" data-tab="efectivo">Efectivo e Inversiones</button>
+                <button class="tab-link" data-tab="cuentas">Cuentas por Cobrar</button>
+                <button class="tab-link" data-tab="inventarios">Inventarios</button>
+                <button class="tab-link" data-tab="inmuebles">Inmuebles, Maquinaria y Equipo</button>
+                <button class="tab-link" data-tab="intangibles">Intangibles</button>
+                <button class="tab-link" data-tab="pasivo">Pasivo</button>
+                <button class="tab-link" data-tab="capital">Capital</button>
+                <button class="tab-link" data-tab="cuestionario">Cuestionario</button>
+            </div>
+
+            <!-- Pestaña para Fundamentos de Auditoría con gráfico -->
+            <div id="fundamentos" class="tab-content active">
+                <h2>Fundamentos de Auditoría</h2>
+                <h3>Objetivos</h3>
+                <ul>
+                    <li>Definir el propósito y alcance de la auditoría en una organización</li>
+                    <li>Garantizar la fiabilidad de la información financiera</li>
+                    <li>Asegurar el cumplimiento de las normativas y estándares aplicables</li>
+                    <li>Identificar riesgos y áreas de mejora en los procesos internos</li>
+                </ul>
+                <h3>Control Interno</h3>
+                <ul>
+                    <li>Establecer políticas y procedimientos que aseguren la integridad de los datos financieros</li>
+                    <li>Implementar revisiones periódicas para evaluar la efectividad de los controles</li>
+                    <li>Garantizar la independencia y objetividad del auditor</li>
+                    <li>Mantener registros adecuados para respaldar las operaciones auditadas</li>
+                    <li>Fomentar una cultura de ética y cumplimiento dentro de la organización</li>
+                </ul>
+                <h3>Procedimientos</h3>
+                <ul>
+                    <li>Planificación de la auditoría, incluyendo la definición de objetivos y alcance</li>
+                    <li>Evaluación de riesgos mediante análisis preliminares</li>
+                    <li>Ejecución de pruebas de auditoría para validar la información financiera</li>
+                    <li>Revisión de documentación y registros contables</li>
+                    <li>Elaboración de un informe final con hallazgos y recomendaciones</li>
+                </ul>
+                <h3>Gráfico de Objetivos</h3>
+                <canvas id="objetivosChart"></canvas>
+            </div>
+
+            <div id="efectivo" class="tab-content">
+                <h2>Efectivo e Inversiones</h2>
+                <h3>Objetivos</h3>
+                <ul>
+                    <li>Comprobar la existencia del efectivo y las inversiones temporales</li>
+                    <li>Verificar su correcta valuación</li>
+                    <li>Determinar su disponibilidad inmediata</li>
+                    <li>Comprobar su correcto registro</li>
+                </ul>
+                <h3>Control interno</h3>
+                <ul>
+                    <li>Controles adecuados sobre las entradas de dinero</li>
+                    <li>Depósito íntegro de la cobranza</li>
+                    <li>Firmas autorizadas</li>
+                    <li>Autorización previa de salidas de dinero, cheques, límites para pagar en efectivo</li>
+                    <li>Segregación adecuada de funciones</li>
+                    <li>Adecuada protección (fianzas)</li>
+                    <li>Valuación periódica de las inversiones</li>
+                    <li>Existencia de registros de valores y sus rendimientos</li>
+                    <li>Arqueos periódicos de efectivo</li>
+                </ul>
+                <h3>Procedimientos</h3>
+                <ul>
+                    <li>Comparación de cifras con otros ejercicios anteriores</li>
+                    <li>Análisis de razones financieras, para juzgar si las variaciones y tendencias de las mismas son razonables</li>
+                    <li>Revisión de conciliaciones bancarias</li>
+                    <li>Revisión de transacciones</li>
+                    <li>Corte de movimientos</li>
+                    <li>Traspasos de fondos</li>
+                    <li>Cálculo de rendimientos</li>
+                </ul>
+                <h3>Presentación y Revelación</h3>
+                <ul>
+                    <li>El efectivo e inversiones debe mostrarse en estado de situación financiera NIF C1</li>
+                    <li>Si existen restricciones en cuanto a su disponibilidad (por separado)</li>
+                    <li>Si su destino está relacionado con adquisiciones</li>
+                    <li>Deberá revelarse la existencia de metales preciosos</li>
+                </ul>
+            </div>
+
+            <div id="cuentas" class="tab-content">
+                <h2>Cuentas por Cobrar</h2>
+                <h3>Objetivos</h3>
+                <ul>
+                    <li>Comprobar la autenticidad</li>
+                    <li>Comprobar la valuación incluyendo el registro de cuentas dudosas</li>
+                    <li>Determinar los gravámenes</li>
+                    <li>Verificar que todos los ingresos estén registrados en contabilidad</li>
+                    <li>Comprobar la adecuada presentación</li>
+                </ul>
+                <h3>Control interno</h3>
+                <ul>
+                    <li>Existencia de autorización ventas a crédito</li>
+                    <li>Segregación adecuada de funciones</li>
+                    <li>Registro en el periodo correspondiente</li>
+                    <li>Control de devoluciones</li>
+                    <li>Vigilancia constante sobre los vencimientos</li>
+                    <li>Otros ingresos</li>
+                    <li>Conciliaciones periódicas</li>
+                </ul>
+                <h3>Procedimientos</h3>
+                <ul>
+                    <li>Comparación de cifras con ejercicios anteriores</li>
+                    <li>Análisis de razones financieras</li>
+                    <li>Operaciones y saldos con partes relacionadas</li>
+                    <li>Obtener explicación de variaciones</li>
+                    <li>Cálculo globales de ingresos</li>
+                    <li>Comparación de cifras con la información</li>
+                </ul>
+                <h3>Presentación y Revelación</h3>
+                <ul>
+                    <li>Clasificación apropiada</li>
+                    <li>Gravámenes en caso de existir</li>
+                    <li>Operaciones y saldos con partes relacionadas</li>
+                    <li>Clientes principales</li>
+                    <li>Compromisos de ventas futuras</li>
+                    <li>Importe de las cuentas por cobrar (ME)</li>
+                </ul>
+            </div>
+
+            <div id="inventarios" class="tab-content">
+                <h2>Inventarios</h2>
+                <h3>Objetivos</h3>
+                <ul>
+                    <li>Comprobar su existencia física</li>
+                    <li>Verificar que sea propiedad de la empresa</li>
+                    <li>Determinar la existencia de gravámenes</li>
+                    <li>Comprobar su adecuada valuación</li>
+                    <li>Comprobar el costo de ventas</li>
+                    <li>Comprobar su adecuada presentación en estados financieros</li>
+                </ul>
+                <h3>Control interno</h3>
+                <ul>
+                    <li>Autorización del método de valuación seleccionado por la empresa</li>
+                    <li>Segregación adecuada de funciones</li>
+                    <li>Registro oportuno de inventarios y el pasivo correspondiente</li>
+                    <li>Registro oportuno de todos los embarques</li>
+                    <li>Control de devoluciones</li>
+                    <li>Custodia física adecuada</li>
+                    <li>Inventarios físicos</li>
+                    <li>Elementos adecuados para el registro y acumulación de los elementos del costo</li>
+                    <li>Registro adecuado para el control de existencias y anticipo de proveedores</li>
+                    <li>Registro adecuado para el control de las existencias propiedad de terceros</li>
+                    <li>Comparación periodica de la suma de los registros auxiliares con el saldo de la cuenta mayor</li>
+                    <li>Comprobación de los inventarios fisicos por personal interno independiente</li>
+                    <li>Procedimiento para determinar la perdida de valor de los inventarios</li>
+                    <li>Adecuada proteccion</li>
+                    <li>Sistemas de informacion sobre cifras actualizadas</li>
+                </ul>
+                <h3>Procedimientos</h3>
+                <ul>
+                    <li>Comparación de cifras a costos históricos</li>
+                    <li>Análisis de razones financieras</li>
+                    <li>Comparación de cifras con la información disponible</li>
+                    <li>Obtener explicación de variaciones importantes</li>
+                    <li>Comprobar faltantes</li>
+                    <li>Verificar su corte de marbetes</li>
+                    <li>Comprobar unidades contadas</li>
+                    <li>Verificar su costo unitario</li>
+                    <li>Verificar operaciones aritméticas</li>
+                    <li>Confirmación de existencias</li>
+                    <li>Efectuar conteos selectivos</li>
+                </ul>
+            </div>
+
+            <div id="inmuebles" class="tab-content">
+                <h2>Inmuebles, Maquinaria y Equipo</h2>
+                <h3>Objetivos</h3>
+                <ul>
+                    <li>Comprobar que existan y estén en uso</li>
+                    <li>Verificar que sean propiedad de la empresa</li>
+                    <li>Verificar su adecuada valuación</li>
+                    <li>Comprobar la depreciación, que se realiza de acuerdo con métodos</li>
+                    <li>Comprobar que haya consistencia</li>
+                    <li>Determinar los gravámenes que existen</li>
+                    <li>Comprobar su adecuada presentación y revelación en los estados financieros</li>
+                </ul>
+                <h3>Control interno</h3>
+                <ul>
+                    <li>Autorización del método de valuación</li>
+                    <li>Aprobación de la administración para adquirir, vender, retirar, destruir o gravar</li>
+                    <li>Segregación adecuada de funciones de adquisición, custodia y registro</li>
+                    <li>Existencia de procedimientos para comprobar que se hayan recibido y registrado adecuadamente los bienes adquiridos</li>
+                    <li>Existencia de archivos de la documentación</li>
+                    <li>Existencia de reglas para distinguir las adiciones de aquellos gastos por conservacion y reparacion</li>
+                    <li>Revision periodica de las construcciones e instalaciones en proceso para registrar oportunamente aquellas que hayan sido terminadas</li>
+                    <li>Comprobacion periodica de la existencia y condiciones fisicas de los bienes</li>
+                    <li>Informacion oportuna al departamento de contabilidad de las unidades dadas de baja</li>
+                    <li>Conciliacion periodica de la suma de los auxiliares contra el saldo de la cuenta mayor</li>
+                    <li>Informacion sistematizada sobre cifras actualizadas</li>
+                </ul>
+                <h3>Procedimientos</h3>
+                <ul>
+                    <li>Comparación de cifras a costos históricos y actualizados</li>
+                    <li>Análisis de razones financieras</li>
+                    <li>Comparación de cifras con la información disponible de empresas del ramo</li>
+                    <li>Obtener explicación de variaciones importantes</li>
+                </ul>
+            </div>
+
+            <div id="intangibles" class="tab-content">
+                <h2>Intangibles</h2>
+                <h3>Objetivos</h3>
+                <ul>
+                    <li>Comprobar que son propiedad de la empresa</li>
+                    <li>Determinar que se trata de erogaciones de las que se derivan beneficios en ejercicios futuros</li>
+                    <li>Cerciorarse que haya consistencia en la política de contabilización</li>
+                    <li>Comprobar su adecuada valuación tomando en consideración su valor potencial de beneficio futuro</li>
+                    <li>Cerciorarse que haya consistencia en la aplicación de los métodos de valuación</li>
+                    <li>Evaluar la razonabilidad del periodo de aplicación de resultados</li>
+                    <li>Determinar la posible existencia de gravameness</li>
+                    <li>Comprobar la adecuada presentacion y revelacion de los estados financieros</li>
+                </ul>
+                <h3>Control interno</h3>
+                <ul>
+                    <li>Autorización, aprobación por parte de la administración de las erogaciones por estos conceptos</li>
+                    <li>Procedimiento y clasificación de las transacciones</li>
+                    <li>Salvaguarda física de la documentación soporte</li>
+                    <li>Verificación y evaluación, revisión periódica de la vigilancia de beneficios futuros</li>
+                </ul>
+                <h3>Procedimientos</h3>
+                <ul>
+                    <li>Comparación de cifras a costos históricos y actualizados con ejercicios anteriores</li>
+                    <li>Análisis de razones financieras</li>
+                    <li>Comparación de cifras con información disponible de empresas del ramo (compartir procesos)</li>
+                    <li>Obtener explicación de relaciones importantes</li>
+                </ul>
+            </div>
+
+            <div id="pasivo" class="tab-content">
+                <h2>Pasivo</h2>
+                <h3>Objetivos</h3>
+                <ul>
+                    <li>Comprobar que todos los pasivos que muestra el estado de situación financiera son reales</li>
+                    <li>Verificar que se incluyan todos los pasivos a cargo de la entidad</li>
+                    <li>Comprobar que los pasivos no estén garantizados por gravámenes sobre activos</li>
+                    <li>Comprobar que los pasivos están adecuadamente clasificados</li>
+                </ul>
+                <h3>Control interno</h3>
+                <ul>
+                    <li>Segregación adecuada de funciones de autorización, compra, recepción, enajenación, registro y pago</li>
+                    <li>Autorización a diferentes niveles para contraer pasivos y garantizarlos</li>
+                    <li>Uso y control efectivo de órdenes de compras y notas de recepción numeradas para gastos y compras</li>
+                    <li>Revisión de facturas, precios y cálculos y cotejo contra las órdenes de compra y notas de recepción</li>
+                    <li>Determinación del monto de los pasivos por concepto de impuestos</li>
+                </ul>
+                <h3>Procedimientos</h3>
+                <ul>
+                    <li>Análisis de variaciones de un periodo a otro y contra el presupuesto</li>
+                    <li>Prueba global de impuestos</li>
+                    <li>Comparación de número de días de crédito con la cifra equivalente del año anterior</li>
+                    <li>Comparación de la lista de proveedores de un periodo a otro con el objetivo de identificar si existen cambios importantes</li>
+                </ul>
+            </div>
+
+            <div id="capital" class="tab-content">
+                <h2>Capital</h2>
+                <h3>Objetivos</h3>
+                <ul>
+                    <li>Comprobar que los saldos y movimientos estén de acuerdo con la escritura constitutiva y sus modificaciones al régimen legal aplicable y acuerdos de los accionistas</li>
+                    <li>Verificar que los conceptos que integran el capital contable estén debidamente valuados</li>
+                    <li>Determinar las restricciones que existan</li>
+                    <li>Comprobar su adecuada presentación y revelación de los estados financieros</li>
+                </ul>
+                <h3>Control interno</h3>
+                <ul>
+                    <li>Existencia de registros de la emisión de títulos que emparen las partes del capital social</li>
+                    <li>Custodia y arqueo de títulos</li>
+                    <li>Autorización y procedimientos adecuados para el pago de dividendos</li>
+                    <li>Informar oportunamente al departamento de contabilidad de los acuerdos de los accionistas administradores, que afecten las cuentas del capital contable</li>
+                    <li>Comparaciones periódicas de la suma de los auxiliares contra el saldo de la cuenta de mayor correspondiente</li>
+                    <li>Información sistematizada sobre cifras actualizadas</li>
+                </ul>
+                <h3>Procedimientos</h3>
+                <ul>
+                    <li>Comparación de valores históricos y actualizados de ejercicios anteriores</li>
+                    <li>Análisis de razones financieras, tales como pasivos a capital, activo a capital</li>
+                    <li>Obtener explicación de variaciones importantes</li>
+                </ul>
+            </div>
+
+            <!-- Pestaña para Cuestionario -->
+            <div id="cuestionario" class="tab-content">
+                <h2>Cuestionario de Auditoría</h2>
+                <div class="question">
+                    <h3>1. ¿Cuál es el objetivo principal de la auditoría?</h3>
+                    <label><input type="radio" name="q1" value="a"> a) Aumentar las ventas</label>
+                    <label><input type="radio" name="q1" value="b"> b) Garantizar la fiabilidad de la información financiera</label>
+                    <label><input type="radio" name="q1" value="c"> c) Reducir costos</label>
+                </div>
+                <div class="question">
+                    <h3>2. ¿Qué procedimiento se usa para validar los inventarios?</h3>
+                    <label><input type="radio" name="q2" value="a"> a) Revisión de conciliaciones bancarias</label>
+                    <label><input type="radio" name="q2" value="b"> b) Conteos selectivos</label>
+                    <label><input type="radio" name="q2" value="c"> c) Cálculo de rendimientos</label>
+                </div>
+                <div class="question">
+                    <h3>3. ¿Qué asegura el control interno en las cuentas por cobrar?</h3>
+                    <label><input type="radio" name="q3" value="a"> a) Autorización de ventas a crédito</label>
+                    <label><input type="radio" name="q3" value="b"> b) Incremento de inventarios</label>
+                    <label><input type="radio" name="q3" value="c"> c) Compra de maquinaria</label>
+                </div>
+                <div class="question">
+                    <h3>4. ¿Dónde se deben presentar los efectivo e inversiones según NIF C1?</h3>
+                    <label><input type="radio" name="q4" value="a"> a) Estado de resultados</label>
+                    <label><input type="radio" name="q4" value="b"> b) Estado de situación financiera</label>
+                    <label><input type="radio" name="q4" value="c"> c) Flujo de efectivo</label>
+                </div>
+                <div class="question">
+                    <h3>5. ¿Qué método se usa para la depreciación de inmuebles?</h3>
+                    <label><input type="radio" name="q5" value="a"> a) Método de valor residual</label>
+                    <label><input type="radio" name="q5" value="b"> b) Métodos contables autorizados</label>
+                    <label><input type="radio" name="q5" value="c"> c) Método de inventarios</label>
+                </div>
+                <div class="question">
+                    <h3>6. ¿Qué se verifica en los intangibles?</h3>
+                    <label><input type="radio" name="q6" value="a"> a) Beneficios futuros</label>
+                    <label><input type="radio" name="q6" value="b"> b) Costo de ventas</label>
+                    <label><input type="radio" name="q6" value="c"> c) Gravámenes sobre efectivo</label>
+                </div>
+                <div class="question">
+                    <h3>7. ¿Qué protege el control interno del pasivo?</h3>
+                    <label><input type="radio" name="q7" value="a"> a) Segregación de funciones</label>
+                    <label><input type="radio" name="q7" value="b"> b) Aumento de capital</label>
+                    <label><input type="radio" name="q7" value="c"> c) Registro de inventarios</label>
+                </div>
+                <div class="question">
+                    <h3>8. ¿Qué procedimiento se usa para el capital?</h3>
+                    <label><input type="radio" name="q8" value="a"> a) Comparación de valores históricos</label>
+                    <label><input type="radio" name="q8" value="b"> b) Revisión de conciliaciones</label>
+                    <label><input type="radio" name="q8" value="c"> c) Cálculo de rendimientos</label>
+                </div>
+                <div class="question">
+                    <h3>9. ¿Qué debe garantizar la independencia del auditor?</h3>
+                    <label><input type="radio" name="q9" value="a"> a) Objetividad en la evaluación</label>
+                    <label><input type="radio" name="q9" value="b"> b) Incremento de ganancias</label>
+                    <label><input type="radio" name="q9" value="c"> c) Reducción de impuestos</label>
+                </div>
+                <div class="question">
+                    <h3>10. ¿Qué incluye un informe final de auditoría?</h3>
+                    <label><input type="radio" name="q10" value="a"> a) Hallazgos y recomendaciones</label>
+                    <label><input type="radio" name="q10" value="b"> b) Lista de inventarios</label>
+                    <label><input type="radio" name="q10" value="c"> c) Previsiones de ventas</label>
+                </div>
+                <button id="calcularBtn" onclick="calcularCalificacion()">Calcular Calificación</button>
+                <div id="calificacion"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer con nombre y expediente -->
+    <footer>
+        <p>Creado por Valeria Gonzalez Perez - Exp. 319994</p>
+    </footer>
+
+    <!-- Script para el Mapa, Gráfico y Cuestionario -->
+    <script>
+        // Datos del mapa conceptual (posiciones proporcionales en un círculo)
+        var nodes = [
+            { id: 1, label: 'Fundamentos de Auditoría', shape: 'circle', color: '#2c3e50', size: 40, x: 0, y: 0, font: { color: '#ffffff' } },
+            { id: 2, label: 'Efectivo e Inversiones', shape: 'box', color: '#3498db', size: 25, x: -173, y: -100 },
+            { id: 3, label: 'Cuentas por Cobrar', shape: 'box', color: '#3498db', size: 25, x: -100, y: -173 },
+            { id: 4, label: 'Inventarios', shape: 'box', color: '#3498db', size: 25, x: 0, y: -200 },
+            { id: 5, label: 'Inmuebles, Maquinaria y Equipo', shape: 'box', color: '#3498db', size: 25, x: 100, y: -173 },
+            { id: 6, label: 'Intangibles', shape: 'box', color: '#3498db', size: 25, x: 173, y: -100 },
+            { id: 7, label: 'Pasivo', shape: 'box', color: '#3498db', size: 25, x: 200, y: 0 },
+            { id: 8, label: 'Capital', shape: 'box', color: '#3498db', size: 25, x: 173, y: 100 }
+        ];
+        var edges = [
+            { from: 1, to: 2, color: { color: '#f1c40f' } },
+            { from: 1, to: 3, color: { color: '#f1c40f' } },
+            { from: 1, to: 4, color: { color: '#f1c40f' } },
+            { from: 1, to: 5, color: { color: '#f1c40f' } },
+            { from: 1, to: 6, color: { color: '#f1c40f' } },
+            { from: 1, to: 7, color: { color: '#f1c40f' } },
+            { from: 1, to: 8, color: { color: '#f1c40f' } }
+        ];
+
+        // Configuración del mapa con física animada
+        var container = document.getElementById('network');
+        var data = { nodes: nodes, edges: edges };
+        var options = {
+            nodes: { font: { size: 14, color: '#34495e', face: 'Arial Narrow' }, borderWidth: 2 },
+            edges: { width: 2, smooth: { type: 'curvedCW' } },
+            physics: { enabled: true, solver: 'forceAtlas2Based', stabilization: { iterations: 1500 } },
+            layout: { randomSeed: undefined },
+            interaction: { zoomView: true, dragView: true }
+        };
+        var network = new vis.Network(container, data, options);
+
+        // Mapeo de nodos a secciones (definido globalmente)
+        var sectionMap = {
+            1: 'fundamentos',
+            2: 'efectivo',
+            3: 'cuentas',
+            4: 'inventarios',
+            5: 'inmuebles',
+            6: 'intangibles',
+            7: 'pasivo',
+            8: 'capital'
+        };
+
+        // Navegación al hacer clic en nodos
+        network.on("click", function (params) {
+            if (params.nodes.length > 0) {
+                var nodeId = params.nodes[0];
+                if (sectionMap[nodeId]) {
+                    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+                    document.querySelectorAll('.tab-link').forEach(btn => btn.classList.remove('active'));
+                    document.getElementById(sectionMap[nodeId]).classList.add('active');
+                    document.querySelector(`button[data-tab="${sectionMap[nodeId]}"]`).classList.add('active');
+                    updateChart(nodeId);
+                }
+            }
+        });
+
+        // Lógica de pestañas
+        document.querySelectorAll('.tab-link').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+                document.querySelectorAll('.tab-link').forEach(btn => btn.classList.remove('active'));
+                document.getElementById(button.getAttribute('data-tab')).classList.add('active');
+                button.classList.add('active');
+                var tabId = button.getAttribute('data-tab');
+                var nodeId = Object.keys(sectionMap).find(key => sectionMap[key] === tabId);
+                if (nodeId) {
+                    updateChart(nodeId);
+                }
+            });
+        });
+
+        // Datos para el gráfico (número de objetivos por sección)
+        var objetivosData = {
+            1: 4, // Efectivo e Inversiones
+            2: 5, // Cuentas por Cobrar
+            3: 6, // Inventarios
+            4: 7, // Inmuebles, Maquinaria y Equipo
+            5: 8, // Intangibles
+            6: 4, // Pasivo
+            7: 4  // Capital
+        };
+        var labels = {
+            1: 'Efectivo',
+            2: 'Cuentas',
+            3: 'Inventarios',
+            4: 'Inmuebles',
+            5: 'Intangibles',
+            6: 'Pasivo',
+            7: 'Capital'
+        };
+
+        // Función para actualizar el gráfico
+        function updateChart(nodeId) {
+            if (nodeId && document.getElementById('objetivosChart')) {
+                var ctx = document.getElementById('objetivosChart').getContext('2d');
+                if (window.myChart) window.myChart.destroy();
+                window.myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(objetivosData).map(key => labels[key]),
+                        datasets: [{
+                            label: 'Número de Objetivos',
+                            data: Object.keys(objetivosData).map(key => objetivosData[key]),
+                            backgroundColor: '#3498db',
+                            borderColor: '#2980b9',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: { display: true, text: 'Cantidad de Objetivos' }
+                            },
+                            x: {
+                                title: { display: true, text: 'Secciones' }
+                            }
+                        },
+                        animation: {
+                            duration: 1000,
+                            easing: 'easeInOutQuad'
+                        },
+                        plugins: {
+                            legend: { display: true }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Inicializar el gráfico con Fundamentos de Auditoría al cargar
+        document.addEventListener('DOMContentLoaded', function() {
+            updateChart(1);
+        });
+
+        // Función para calcular la calificación del cuestionario
+        function calcularCalificacion() {
+            var respuestasCorrectas = {
+                q1: 'b', // Garantizar la fiabilidad de la información financiera
+                q2: 'b', // Conteos selectivos
+                q3: 'a', // Autorización de ventas a crédito
+                q4: 'b', // Estado de situación financiera
+                q5: 'b', // Métodos contables autorizados
+                q6: 'a', // Beneficios futuros
+                q7: 'a', // Segregación de funciones
+                q8: 'a', // Comparación de valores históricos
+                q9: 'a', // Objetividad en la evaluación
+                q10: 'a' // Hallazgos y recomendaciones
+            };
+            var calificacion = 0;
+
+            for (var q in respuestasCorrectas) {
+                var seleccionada = document.querySelector(`input[name="${q}"]:checked`);
+                if (seleccionada && seleccionada.value === respuestasCorrectas[q]) {
+                    calificacion++;
+                }
+            }
+
+            var resultado = document.getElementById('calificacion');
+            resultado.innerHTML = `Tu calificación es: ${calificacion} de 10 (${(calificacion / 10) * 100}%)`;
+        }
+    </script>
+</body>
+</html>
